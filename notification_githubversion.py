@@ -25,13 +25,16 @@ reddit = praw.Reddit(client_id=CLIENT_ID,
                      password=PASSWORD)
 
 client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN) #SETS UP THE TWILLIO CLIENT WITH YOUR INFO TO SEND MESSAGES
-
+post_ids = [] # empty list that will be apended with post ids as the programs run to ensure you dont get notified for only new posts.
+              # will be reset when you close the program.
 def check_new_posts(): 
     for post in reddit.subreddit('R4R30Plus').new(limit=10):  #LOOPS THROUGH THE 10 NEWEST POSTS IN THE R4R30PLUS SUBREDDIT
-        if "f4r" in post.title.lower() or "f4m" in post.title.lower(): # CHECKS FOR ANY FEMALE POSTS
-            
-            message = f"there is a new message on r4r30plus; check it out:\n{post.title}\n" # ITS THE MESSAGE THAT WILL BE SENT TO YOU, EDIT IT TO SAY WHATEVER YOU LIKE
-            client.messages.create(body=message, from_=TWILIO_PHONE_NUMBER, to=DEST_PHONE_NUMBER) # THE PART OF THE CODE THAT ACTUALLY SENDS THE MESSAGE
+      if post.id in posts_ids:
+				if "f4r" in post.title.lower() or "f4m" in post.title.lower(): # CHECKS FOR ANY FEMALE POSTS
+					message = f"there is a new message on r4r30plus; check it out:\n{post.title}\n" # ITS THE MESSAGE THAT WILL BE SENT TO YOU, EDIT IT TO SAY WHATEVER YOU LIKE
+					client.messages.create(body=message, from_=TWILIO_PHONE_NUMBER, to=DEST_PHONE_NUMBER) # THE PART OF THE CODE THAT ACTUALLY SENDS THE MESSAGE
+			else:
+        print('No new posts, will try again in 30 minutes.')
 
 if __name__ == "__main__":
     while True: #INFINATE LOOP, STOP THE PROGRAM WITH CTRL-C
